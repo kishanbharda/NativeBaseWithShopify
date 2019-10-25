@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { View, FlatList, Image, StyleSheet } from 'react-native';
 import { Container, Content, Text, Card, CardItem, Title, Segment, Button, Header, Tab, Tabs, ScrollableTab } from 'native-base';
+import { connect } from 'react-redux';
+import { fetchProducts } from '../actions/productsAction';
 import collections from '../data/collections';
 
 const Temp = () => {
@@ -34,13 +36,37 @@ class Products extends Component {
     };
   }
 
+  componentDidMount = () => {
+    this.props.fetchProducts();
+  }
+
   render() {
     return (
       <Container>
         {/* <Header hasTabs /> */}
         <Tabs renderTabBar={() => <ScrollableTab />}>
           <Tab heading="Men">
-            <Temp />
+            {
+              <FlatList
+                data={this.props.products.data}
+                extraData={this.props.products.data}
+                numColumns={2}
+                keyExtractor={item => item.id}
+                renderItem={({item, index}) => (
+                  <Card style={Styles.category} key={index.toString()}>
+                    <CardItem>
+                      <Image 
+                        source={{uri: item.images[0].src}}
+                        style={{width: '100%', height: 200}}
+                      />  
+                    </CardItem>
+                    <CardItem>
+                      <Title style={{color: "#000000"}}>{item.title}</Title>
+                    </CardItem>
+                  </Card>
+                )}
+              />
+            }
           </Tab>
           <Tab heading="Women">
             <Temp />
@@ -69,4 +95,12 @@ const Styles = StyleSheet.create({
   }
 })
 
-export default Products;
+const mapStateToProps = (state) => ({
+  products: state.productsReducer
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  fetchProducts: () => dispatch(fetchProducts())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Products);

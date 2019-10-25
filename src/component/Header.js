@@ -14,10 +14,10 @@ const CommonHeader = (props) => {
       </Body>
       <Right>
         <Button transparent>
-          <Icon name="heart" />
+          <Icon name="heart" active={false} />
         </Button>
         <Button transparent>
-          <Icon name="cart" />
+          <Icon name="cart" active={false} />
           <Badge style={{ position: 'absolute', right: 0, height: 25, width: 25, padding: 0}}>
             <Text style={{fontSize: 12, fontWeight: "bold"}}>2</Text>
           </Badge>
