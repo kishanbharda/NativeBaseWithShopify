@@ -44,6 +44,8 @@ const StackNavigator = createDrawerNavigator({
   Account: {
     screen: Account
   }
+}, {
+  unmountInactiveRoutes: true
 });
 
 const AppContainer = createAppContainer(StackNavigator);

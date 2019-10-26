@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { StyleSheet, Dimensions, ImageBackground, View, Image, FlatList } from 'react-native';
 import { Container, Content, Footer, Left, Icon, Body, Button, Title, FooterTab, Text, Right, Card, CardItem } from 'native-base';
 import Carousel from 'react-native-snap-carousel';
+import { connect } from 'react-redux';
+import { fetchCollections } from '../actions/collectionsActions';
 import banner from '../data/banner';
 import collection from '../data/collections';
 
@@ -9,7 +11,13 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      collections: []
     };
+  }
+
+  componentDidMount = async () => {
+    const collections = await this.props.fetchCollections();
+    this.setState({ collections });
   }
 
   renderBanner = ({item, index}) => {
@@ -26,17 +34,29 @@ class Home extends Component {
       </ImageBackground>
     )
   }  
+
+  navigateToProducts = (collectionId) => {
+    console.log(collectionId);
+    this.props.navigation.navigate("Products", {
+      collectionId
+    });
+    // this.props.navigation.navigate("Products", {}, {
+    //   type: "Navigate",
+    //   routeName: "Products",
+    //   collectionId
+    // })
+  }
   
-  renderCategories = ({item, index}) => {
+  renderCategories = ({item}) => {
     return (
-      <Card style={Styles.category} key={index.toString()}>
-        <CardItem>
+      <Card style={Styles.category}>
+        <CardItem button onPress={() => this.navigateToProducts(item.id)}>
           <Image 
-            source={item.image}
+            source={{uri: item.image?.src}}
             style={{width: '100%', height: 200}}
           />  
         </CardItem>
-        <CardItem>
+        <CardItem button onPress={() => this.navigateToProducts(item.id)}>
           <Title style={{color: "#000000"}}>{item.title}</Title>
         </CardItem>
       </Card>
@@ -86,10 +106,10 @@ class Home extends Component {
           {/* Categories */}
           <View style={{margin: 10}}>
             <FlatList
-              data={collection}
-              extraData={collection}
+              data={this.state.collections}
+              extraData={this.state}
               numColumns={2}
-              keyExtractor={item => item.title}
+              keyExtractor={item => item.id}
               renderItem={this.renderCategories}
             />
           </View>
@@ -113,7 +133,6 @@ class Home extends Component {
             sliderWidth={Dimensions.get('screen').width}
             itemWidth={(Dimensions.get('screen').width / 2) - 10}
           />
-
         </Content>
       </Container>
     );
@@ -130,17 +149,23 @@ const Styles = StyleSheet.create({
     overflow: 'hidden',
   },
   categoryContainer: {
-    // flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
     flexWrap: 'wrap'
   },
   category: {
     flex: 0.5,
-    // width: (Dimensions.get('screen').width / 2) - 20,
     overflow: 'hidden',
     alignItems: 'center'
   }
 })
 
-export default Home;
+const mapStateToProps = (state) => ({
+  collections: state.collectionsReducer
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  fetchCollections: () => dispatch(fetchCollections())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
