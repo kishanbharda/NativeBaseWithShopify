@@ -3,13 +3,18 @@ import { View, FlatList, Image, StyleSheet, Dimensions } from 'react-native';
 import { Container, Content, Text, Card, CardItem, Title, Button, Tab, Tabs, ScrollableTab } from 'native-base';
 import { connect } from 'react-redux';
 import { fetchAllCollectionWithProducts } from '../actions/productsAction';
+import ListLoader from '../component/ListLoader';
+import ListEmpty from '../component/ListEmpty';
+import Messages from '../../config/Messages';
+import ProductItem from '../component/ProductItem';
 
 class Products extends Component {
   constructor(props) {
     super(props);
     this.state = {
       collections: [],
-      initialPage: 0
+      initialPage: 0,
+      isLoading: false
     };
   }
 
@@ -17,41 +22,35 @@ class Products extends Component {
     this.fetchCollections();
   }
 
-  // static getDerivedStateFromProps(nextProps, prevState) {
-  //   if (nextProps.initialPage !== prevState.initialPage) {
-  //     return { initialPage: nextProps.someValue};
-  //   }
-  //   return null;
-  // }
-
   fetchCollections = async () => {
+    this.setState({ isLoading: true });
     const collections = await this.props.fetchAllCollectionWithProducts();
     this.setState({ collections }, () => {
       const parentCollection = this.props.navigation.dangerouslyGetParent().getParam('collectionId');
-      // const parentCollection = this.props.navigation.getParam("collectionId");
-      console.log(parentCollection);
       if (parentCollection) {
         const collectionToDisplay = this.state.collections.find((ele) => ele.id === parentCollection);
         this.setState({
-          initialPage: this.state.collections.indexOf(collectionToDisplay)
+          initialPage: this.state.collections.indexOf(collectionToDisplay),
+          isLoading: false
         });
+      } else {
+        this.setState({ isLoading: false });
       }
     });
   }
 
+  renderEmptyList = () => {
+    if (this.state.isLoading) {
+      return <ListLoader />
+    }
+    return (
+      <ListEmpty message={Messages.products.emptyProducts} />
+    )
+  }
+
   renderProducts = ({item}) => {
     return (
-      <Card style={Styles.category}>
-        <CardItem>
-          <Image 
-            source={{uri: item.images[0].src}}
-            style={{width: '100%', height: 200}}
-          />  
-        </CardItem>
-        <CardItem>
-          <Title style={{color: "#000000"}}>{item.title}</Title>
-        </CardItem>
-      </Card>
+      <ProductItem product={item} />
     )
   }
 
@@ -65,10 +64,13 @@ class Products extends Component {
               <Tab heading={collection.title}>
                 <FlatList
                   data={collection.products}
+                  style={{flex: 1, backgroundColor: "#ffffff"}}
+                  contentContainerStyle={{flexGrow: 1, paddingBottom: 50, paddingHorizontal: 5, paddingTop: 5, backgroundColor: "#ffffff" }}
                   extraData={collection.products}
                   numColumns={2}
                   keyExtractor={productItem => productItem.id}
                   renderItem={this.renderProducts}
+                  ListEmptyComponent={this.renderEmptyList}
                 />
               </Tab>
             ))
@@ -78,14 +80,6 @@ class Products extends Component {
     );
   }
 }
-
-const Styles = StyleSheet.create({
-  category: {
-    flex: 0.5,
-    overflow: 'hidden',
-    alignItems: 'center'
-  }
-})
 
 const mapStateToProps = (state) => ({
   products: state.productsReducer

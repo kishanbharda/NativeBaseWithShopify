@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { fetchCollections } from '../actions/collectionsActions';
 import banner from '../data/banner';
 import collection from '../data/collections';
+import Colors from '../../config/Colors';
 
 class Home extends Component {
   constructor(props) {
@@ -36,15 +37,9 @@ class Home extends Component {
   }  
 
   navigateToProducts = (collectionId) => {
-    console.log(collectionId);
     this.props.navigation.navigate("Products", {
       collectionId
     });
-    // this.props.navigation.navigate("Products", {}, {
-    //   type: "Navigate",
-    //   routeName: "Products",
-    //   collectionId
-    // })
   }
   
   renderCategories = ({item}) => {
@@ -90,17 +85,19 @@ class Home extends Component {
             ref={(c) => { this.carousel = c; }}
             data={banner}
             containerCustomStyle={{
-              marginVertical: 10,
+              backgroundColor: Colors.homeBannerBg,
+              padding: 10
             }}
             contentContainerCustomStyle={{
               alignItems: 'flex-start',
             }}
             renderItem={this.renderBanner}
             inactiveSlideScale={0.98}
-            inactiveSlideOpacity={0.7}
+            inactiveSlideOpacity={0.6}
             sliderHeight={300}
+            firstItem={1}
             sliderWidth={Dimensions.get('screen').width}
-            itemWidth={Dimensions.get('screen').width - 30}
+            itemWidth={Dimensions.get('screen').width - 100}
           />
 
           {/* Categories */}
@@ -128,7 +125,6 @@ class Home extends Component {
             inactiveSlideScale={0.9}
             inactiveSlideOpacity={0.6}
             sliderHeight={300}
-            firstItem={(collection.length / 2)}
             activeSlideAlignment="center"
             sliderWidth={Dimensions.get('screen').width}
             itemWidth={(Dimensions.get('screen').width / 2) - 10}

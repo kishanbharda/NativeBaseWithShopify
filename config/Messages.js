@@ -28,7 +28,7 @@ const Messages = {
         notAvailable: "Internet connection is not available"
     },
     products: {
-        emptyProducts: "Sorry, There is no products available."
+      emptyProducts: "Sorry, There is no products available."
     }
 }
 
