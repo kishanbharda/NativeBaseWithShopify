@@ -5,6 +5,7 @@ import { createDrawerNavigator } from 'react-navigation-drawer';
 import Home from './src/container/Home';
 import Products from './src/container/Products';
 import Account from './src/container/Account';
+import ProductDetail from './src/container/ProductDetail';
 import Categories from './src/container/Categories';
 import Header from './src/component/Header';
 
@@ -16,21 +17,23 @@ const HomeStackNavigator = createStackNavigator({
   defaultNavigationOptions: ({navigation}) => {
     const {routeName} = navigation.state;
     return {
-      header: <Header hasTabs={false} title={routeName} onPress={() => navigation.openDrawer()} />
+      header: <Header hasTabs={false} title={routeName} onMenuPress={() => navigation.openDrawer()} />
     }
   }
 });
 
 const ProductsStackNavigator = createStackNavigator({
   Products: {
-    screen: Products
-  }
-}, {
-  defaultNavigationOptions: ({navigation}) => {
-    const {routeName} = navigation.state;
-    return {
-      header: <Header hasTabs={true} title={routeName} onPress={() => navigation.openDrawer()} />
-    }
+    screen: Products,
+      navigationOptions: ({navigation}) => {
+        const {routeName} = navigation.state;
+        return {
+          header: <Header hasTabs={true} title={routeName} onMenuPress={() => navigation.openDrawer()} />
+        }
+      }
+  },
+  ProductDetail: {
+    screen: ProductDetail
   }
 });
 

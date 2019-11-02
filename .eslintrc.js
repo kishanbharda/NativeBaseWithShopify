@@ -80,6 +80,7 @@ module.exports = {
       "max-len": 0,
       "react/jsx-one-expression-per-line": 0,
       "react/no-access-state-in-setstate": 0,
-      "no-plusplus": 0
+      "no-plusplus": 0,
+      "react/prop-types": 0
   }
 };

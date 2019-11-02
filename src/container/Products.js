@@ -50,7 +50,15 @@ class Products extends Component {
 
   renderProducts = ({item}) => {
     return (
-      <ProductItem product={item} />
+      <ProductItem 
+        key={item.id}
+        product={item} 
+        onPress={() => {
+          this.props.navigation.navigate("ProductDetail", {
+            id: item.id
+          })
+        }} 
+      />
     )
   }
 
@@ -58,31 +66,46 @@ class Products extends Component {
     return (
       <Container>
         {/* <Header hasTabs /> */}
-        <Tabs renderTabBar={() => <ScrollableTab />} initialPage={this.state.initialPage} page={this.state.initialPage}>
-          {
-            this.state.collections.map((collection) => (
-              <Tab heading={collection.title}>
-                <FlatList
-                  data={collection.products}
-                  style={{flex: 1, backgroundColor: "#ffffff"}}
-                  contentContainerStyle={{flexGrow: 1, paddingBottom: 50, paddingHorizontal: 5, paddingTop: 5, backgroundColor: "#ffffff" }}
-                  extraData={collection.products}
-                  numColumns={2}
-                  keyExtractor={productItem => productItem.id}
-                  renderItem={this.renderProducts}
-                  ListEmptyComponent={this.renderEmptyList}
-                />
-              </Tab>
-            ))
-          }
-        </Tabs>
+        {
+          this.state.collections.length === 0 ? (
+            <Tabs renderTabBar={() => <ScrollableTab />}>
+              {
+                this.props.collections.data.map((item) => (
+                  <Tab heading={item.title}>
+                    <ListLoader />
+                  </Tab>
+                ))
+              }
+            </Tabs>
+          ) : (
+            <Tabs renderTabBar={() => <ScrollableTab />} initialPage={this.state.initialPage} page={this.state.initialPage}>
+              {
+                this.state.collections.map((collection) => (
+                  <Tab heading={collection.title}>
+                    <FlatList
+                      data={collection.products}
+                      style={{flex: 1, backgroundColor: "#ffffff"}}
+                      contentContainerStyle={{flexGrow: 1, paddingBottom: 50, paddingHorizontal: 5, paddingTop: 5, backgroundColor: "#ffffff" }}
+                      extraData={collection.products}
+                      numColumns={2}
+                      keyExtractor={productItem => productItem.id}
+                      renderItem={this.renderProducts}
+                      ListEmptyComponent={this.renderEmptyList}
+                    />
+                  </Tab>
+                ))
+              }
+            </Tabs>
+          )
+        }
       </Container>
     );
   }
 }
 
 const mapStateToProps = (state) => ({
-  products: state.productsReducer
+  products: state.productsReducer,
+  collections: state.collectionsReducer
 });
 
 const mapDispatchToProps = (dispatch) => ({

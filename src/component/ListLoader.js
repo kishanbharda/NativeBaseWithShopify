@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import PropTypes from 'prop-types';
 import Colors from '../../config/Colors';
 
 const ListLoader = () => {
