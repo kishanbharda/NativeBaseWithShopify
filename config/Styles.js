@@ -6,7 +6,7 @@
  * @param {Number} opacity opacity of the shadow
  * @param {Number} radius radius of the shadow
  */
-export const getShadow = ({width = 0, height = 1, color = "#0000ff", opacity = 0.5, radius = 10} = {}) => {
+export const getShadow = ({width = 0, height = 0, color = "#aaaaaa", opacity = 0.3, radius = 5} = {}) => {
   return {
       shadowColor: color,
       shadowOffset: {

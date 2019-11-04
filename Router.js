@@ -25,16 +25,18 @@ const HomeStackNavigator = createStackNavigator({
 const ProductsStackNavigator = createStackNavigator({
   Products: {
     screen: Products,
-      navigationOptions: ({navigation}) => {
-        const {routeName} = navigation.state;
-        return {
-          header: <Header hasTabs={true} title={routeName} onMenuPress={() => navigation.openDrawer()} />
-        }
+    navigationOptions: ({navigation}) => {
+      return {
+        header: <Header hasTabs={true} title={"Products"} onMenuPress={() => navigation.openDrawer()} />
       }
+    }
   },
   ProductDetail: {
-    screen: ProductDetail
-  }
+    screen: ProductDetail,
+    // navigationOptions: {
+    //   header: null
+    // }
+  },
 });
 
 const StackNavigator = createDrawerNavigator({

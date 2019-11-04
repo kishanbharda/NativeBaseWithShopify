@@ -44,7 +44,7 @@ BtnRound.propTypes = {
   iconSize: PropTypes.number,
   iconColor: PropTypes.string,
   solid: PropTypes.bool,
-  style: PropTypes.instanceOf(PropTypes.object),
+  style: PropTypes.instanceOf(PropTypes.any),
 }
 
 BtnRound.defaultProps = {
@@ -55,7 +55,7 @@ BtnRound.defaultProps = {
   iconSize: 18,
   iconColor: Colors.primary,
   solid: false,
-  style: {}
+  style: null
 };
 
 export default BtnRound

@@ -7,6 +7,7 @@ import ListLoader from '../component/ListLoader';
 import ListEmpty from '../component/ListEmpty';
 import Messages from '../../config/Messages';
 import ProductItem from '../component/ProductItem';
+import Colors from '../../config/Colors';
 
 class Products extends Component {
   constructor(props) {
@@ -71,7 +72,7 @@ class Products extends Component {
             <Tabs renderTabBar={() => <ScrollableTab />}>
               {
                 this.props.collections.data.map((item) => (
-                  <Tab heading={item.title}>
+                  <Tab heading={item.title} key={item.id}>
                     <ListLoader />
                   </Tab>
                 ))
@@ -81,7 +82,10 @@ class Products extends Component {
             <Tabs renderTabBar={() => <ScrollableTab />} initialPage={this.state.initialPage} page={this.state.initialPage}>
               {
                 this.state.collections.map((collection) => (
-                  <Tab heading={collection.title}>
+                  <Tab 
+                    heading={collection.title} 
+                    key={collection.id}
+                  >
                     <FlatList
                       data={collection.products}
                       style={{flex: 1, backgroundColor: "#ffffff"}}
