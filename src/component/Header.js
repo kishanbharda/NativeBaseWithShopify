@@ -1,7 +1,11 @@
 import React from 'react';
 import { Header, Left, Right, Button, Body, Title, Icon, Badge, Text } from 'native-base';
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux';
 import Colors from '../../config/Colors';
+
+const ICON_COLOR = "#ec407a";
+const TRAN_HEADER_ICON_COLOR = Colors.primary;
 
 const CommonHeader = (props) => {
   return (
@@ -15,32 +19,32 @@ const CommonHeader = (props) => {
         props.requireBackButton ? (
           <Left>
             <Button transparent onPress={props.onBackButtonPress} tintColor="#ff0000">
-              <Icon type="Ionicons" name="arrow-back" style={{color:(props.transparent) ? Colors.primary : "#ff0000"}} />
+              <Icon type="Ionicons" name="arrow-back" style={{color:(props.transparent) ? TRAN_HEADER_ICON_COLOR : ICON_COLOR}} />
               {/* <Text>Back</Text> */}
             </Button>
           </Left>
         ) : (
           <Left>
             <Button transparent onPress={props.onMenuPress}>
-              <Icon type="Ionicons" name="menu" style={{color:(props.transparent) ? Colors.primary : "#ff0000"}} />
+              <Icon type="Ionicons" name="menu" style={{color:(props.transparent) ? TRAN_HEADER_ICON_COLOR : ICON_COLOR}} />
             </Button>
           </Left>
         )
       }
      
       <Body>
-        <Title style={{color: "#ff0000"}}>{props.title}</Title>
+        <Title style={{color:(props.transparent) ? TRAN_HEADER_ICON_COLOR : ICON_COLOR}}>{props.title}</Title>
       </Body>
       <Right>
         <Button transparent onPress={props.onWishlistPress}>
-          <Icon name="heart" active={false} style={{color:(props.transparent) ? Colors.primary : "#ff0000"}} />
+          <Icon name="heart" active={false} style={{color:(props.transparent) ? TRAN_HEADER_ICON_COLOR : ICON_COLOR }} />
         </Button>
         <Button transparent onPress={props.onCartPress} icon>
-          <Icon name="cart" active={false} style={{color:(props.transparent) ? Colors.primary : "#ff0000"}} />
+          <Icon name="cart" active={false} style={{color:(props.transparent) ? TRAN_HEADER_ICON_COLOR : ICON_COLOR }} />
           {
-            props.badge !== 0 && (
+            props.cart.totalItems !== 0 && (
               <Badge style={{ position: 'absolute', right: 0, height: 25, width: 25, padding: 0}}>
-                <Text style={{fontSize: 12, fontWeight: "bold"}}>{props.badge}</Text>
+                <Text style={{fontSize: 12, fontWeight: "bold"}}>{props.cart.totalItems}</Text>
               </Badge>
             )
           }
@@ -57,7 +61,7 @@ CommonHeader.propTypes = {
   title: PropTypes.string,
   onWishlistPress: PropTypes.func,
   onCartPress: PropTypes.func,
-  badge: PropTypes.number,
+  // badge: PropTypes.number,
   transparent: PropTypes.bool
 }
 
@@ -68,8 +72,12 @@ CommonHeader.defaultProps = {
   title: "Native Base",
   onWishlistPress: null,
   onCartPress: null,
-  badge: 0,
+  // badge: 0,
   transparent: false
 }
 
-export default CommonHeader
+const mapStateToProps = (state) => ({
+  cart: state.cartReducer
+});
+
+export default connect(mapStateToProps, null)(CommonHeader)

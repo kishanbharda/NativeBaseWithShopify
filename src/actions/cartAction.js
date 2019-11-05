@@ -37,6 +37,7 @@ export const addToCart = (cartItem) => {
       type: Types.ADD_TO_CART,
       cartItem
     });
+    console.log(parseInt(cartItem.quantity, 10));
     dispatch({
       type: Types.ADD_TO_TOTAL_ITEMS,
       items: parseInt(cartItem.quantity, 10)

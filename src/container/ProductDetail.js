@@ -5,6 +5,7 @@ import FastImage from 'react-native-fast-image';
 import Swiper from 'react-native-swiper';
 import Carousel from 'react-native-snap-carousel';
 import { connect } from 'react-redux';
+import { addToCart, updateQuantity } from '../actions/cartAction';
 import { fetchSingleProduct } from '../actions/productsAction';
 import Header from '../component/Header';
 import Loader from '../component/Loader';
@@ -13,6 +14,8 @@ import { getShadow } from '../../config/Styles';
 import CText from '../component/CText';
 import Hr from '../component/Hr';
 import BtnRound from '../component/BtnRound';
+import showToast from '../component/showToast';
+import showError from '../component/showError';
 
 class ProductDetail extends Component {
   // eslint-disable-next-line react/sort-comp
@@ -27,6 +30,8 @@ class ProductDetail extends Component {
       isLoading: true,
       selectedOptions: [],
       selectedVariant: null,
+      isAddingToCart: false,
+      quantity: 1
     };
   }
 
@@ -80,6 +85,52 @@ class ProductDetail extends Component {
         this.setState({ selectedVariant: this.state.product.variants[i] });
         break;
       }
+    }
+  }
+
+  addToCart = async () => {
+    this.setState({ isAddingToCart: true });
+    // let variantKey = [];
+    // Object.keys(this.state.selectedOptions).forEach((element) => {
+    //   variantKey.push(this.state.selectedOptions[element])
+    // });
+
+    // variantKey = variantKey.join(" / ");
+    // const selectedVariant = this.state.product.variants.filter((variant) => variant.title === variantKey)[0];
+
+    const {selectedVariant} = this.state;
+    const exist = this.props.cartItems.data.find((item) => item.variantId === selectedVariant.id);
+    if (exist) {
+      const index = this.props.cartItems.data.indexOf(exist);
+      exist.quantity = parseInt(exist.quantity, 10) + parseInt(this.state.quantity, 10);
+      await this.props.updateQuantity(exist, index);
+      this.setState({ isAddingToCart: false });
+      showToast("Item added to your Cart");
+    } else {
+      /*
+          Here variant is the selected options. For example if user 
+          has selected "size: small" and "color: red" then 
+          selectedOptions is [{name: 'size', value: 'small'}, {name: color, value: 'red'}]
+      */
+      const cartItem = {
+        productId: this.state.product.id,
+        productTitle: this.state.product.title,
+        variantId: selectedVariant.id,
+        variant: this.state.selectedOptions,
+        image: selectedVariant.image,
+        price: selectedVariant.price,
+        quantity: parseInt(this.state.quantity, 10),
+      }
+      this.props.addToCart(cartItem).then(() => {
+        this.setState({ isAddingToCart: false });
+        showToast("Item added to your Cart");
+      }).catch((error) => {
+        this.setState({ isAddingToCart: false }, () => {
+          setTimeout(() => {
+            showError(error.message);
+          }, 100);
+        })
+      });
     }
   }
   
@@ -195,7 +246,7 @@ class ProductDetail extends Component {
             )
           }
       
-        <Button dark block style={styles.btnAddToCart} iconLeft>
+        <Button dark block style={styles.btnAddToCart} iconLeft onPress={this.addToCart}>
           <Icon name="cart-plus" type="FontAwesome5" />
           <Text>ADD TO CART</Text>
         </Button>
@@ -261,8 +312,16 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  fetchSingleProduct: (productId) => dispatch(fetchSingleProduct(productId))
+const mapStateToProps = (state) => ({
+  products: state.productsReducer,
+  cartItems: state.cartReducer,
+  wishlistItems: state.wishlistReducer
 });
 
-export default connect(null, mapDispatchToProps)(ProductDetail);
+const mapDispatchToProps = (dispatch) => ({
+  fetchSingleProduct: (productId) => dispatch(fetchSingleProduct(productId)),
+  addToCart: (cartItem) => dispatch(addToCart(cartItem)),
+  updateQuantity: (element, index) => dispatch(updateQuantity(element, index))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProductDetail);
