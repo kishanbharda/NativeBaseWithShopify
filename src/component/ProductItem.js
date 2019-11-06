@@ -4,11 +4,23 @@ import FastImage from 'react-native-fast-image'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { addToCart, updateQuantity } from '../actions/cartAction';
+import { addToWishlist, removeFromWishlist } from '../actions/wishlistAction';
 import Colors from '../../config/Colors';
 import { getShadow } from '../../config/Styles';
 import BtnRound from './BtnRound';
 
 const BORDER_RADIUS = 10;
+
+type WishlistItem = {
+  productId: String,
+  productTitle: String,
+  variantId: String,
+  variant: Object,
+  image: String,
+  price: String,
+  quantity: Number,
+  isAvailable: Boolean
+}
 
 class ProductItem extends Component {
   constructor(props) {
@@ -44,6 +56,48 @@ class ProductItem extends Component {
     }
   }
 
+  addToWishlist = () => {
+    const selectedVariant = this.state.product.variants[0];
+    const wishlistItem = {
+      productId: this.state.product.id,
+      productTitle: this.state.product.title,
+      variantId: selectedVariant.id,
+      variant: selectedVariant,
+      image: selectedVariant.image,
+      price: selectedVariant.price,
+      quantity: 1,
+      isAvailable: selectedVariant.available
+    }
+    this.props.addToWishlist(wishlistItem);
+  }
+
+  removeFromWishlist = () => {
+    this.props.removeFromWishlist(this.state.product.id);
+  }
+
+  renderWishlistButton = () => {
+    const exist = this.props.wishlist.data.find((item) => item.productId === this.state.product?.id);
+    if (exist) {
+      return (
+        <BtnRound
+          icon="heart"
+          solid
+          size={35}
+          style={styles.btnWishlist}
+          onPress={this.removeFromWishlist}
+        />
+      )
+    }
+    return (
+      <BtnRound
+        icon="heart"
+        size={35}
+        style={styles.btnWishlist}
+        onPress={this.addToWishlist}
+      />
+    )
+  }
+
   render() {
     const { product } = this.props;
     return (
@@ -73,11 +127,7 @@ class ProductItem extends Component {
             style={styles.btnCart}
             onPress={this.addToCart}
           />
-          <BtnRound
-            icon="heart"
-            size={35}
-            style={styles.btnWishlist}
-          />
+          {this.renderWishlistButton()}
         </View>
         <View style={styles.detailContainer}>
           <View style={{ flex: 7 }}>
@@ -147,12 +197,15 @@ ProductItem.defaultProps = {
 }
 
 const mapStateToProps = (state) => ({
-  cart: state.cartReducer
+  cart: state.cartReducer,
+  wishlist: state.wishlistReducer
 });
 
 const mapDispatchToProps = (dispatch) => ({
   addToCart: (cartItem) => dispatch(addToCart(cartItem)),
-  updateQuantity: (element) => dispatch(updateQuantity(element))
+  updateQuantity: (element) => dispatch(updateQuantity(element)),
+  addToWishlist: (wishlistItem: WishlistItem) => dispatch(addToWishlist(wishlistItem)),
+  removeFromWishlist: (productId) => dispatch(removeFromWishlist(productId))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductItem)

@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity, Image, Dimensions, FlatList, ActivityIndicator } from 'react-native';
-import { Button, Text, Left, Icon, List, ListItem, Right, Container, Content } from 'native-base';
+import { Button, Text, Icon, Content } from 'native-base';
 import FastImage from 'react-native-fast-image';
-import Swiper from 'react-native-swiper';
-import Carousel from 'react-native-snap-carousel';
 import { connect } from 'react-redux';
 import { addToCart, updateQuantity } from '../actions/cartAction';
+import { addToWishlist, removeFromWishlist } from '../actions/wishlistAction';
 import { fetchSingleProduct } from '../actions/productsAction';
 import Header from '../component/Header';
 import Loader from '../component/Loader';
@@ -14,16 +13,16 @@ import { getShadow } from '../../config/Styles';
 import CText from '../component/CText';
 import Hr from '../component/Hr';
 import BtnRound from '../component/BtnRound';
-import showToast from '../component/showToast';
 import showError from '../component/showError';
 
 class ProductDetail extends Component {
   static navigationOptions = ({navigation}) => ({
     header: <Header
-      title={"Detail"}
+      title={navigation.state.params.title || "Detail"}
       requireBackButton={true}
       onBackButtonPress={() => navigation.goBack()}
       onCartPress={() => navigation.navigate('Cart')}
+      onWishlistPress={() => navigation.navigate('Wishlist')} 
       noShadow
     />
   });
@@ -48,7 +47,7 @@ class ProductDetail extends Component {
     this.setState({ isLoading: true });
     const productId = this.props.navigation.getParam("id");
     const product = await this.props.fetchSingleProduct(productId);
-    console.log(product);
+    this.props.navigation.setParams({ title: (product) ? product.title : "Detail" });
     this.setState({ product }, () => {
       this.setState({ selectedVariant: this.state.product.variants[0] });
       this.setInitialVariant();
@@ -128,6 +127,50 @@ class ProductDetail extends Component {
       });
     }
   }
+
+  addToWishlist = () => {
+    const selectedVariant = this.state.product.variants[0];
+    const wishlistItem = {
+      productId: this.state.product.id,
+      productTitle: this.state.product.title,
+      variantId: selectedVariant.id,
+      variant: selectedVariant,
+      image: selectedVariant.image,
+      price: selectedVariant.price,
+      quantity: 1,
+      isAvailable: selectedVariant.available
+    }
+    this.props.addToWishlist(wishlistItem);
+  }
+
+  removeFromWishlist = () => {
+    this.props.removeFromWishlist(this.state.product.id);
+  }
+
+  renderWishlistButton = () => {
+    const exist = this.props.wishlist.data.find((item) => item.productId === this.state.product?.id);
+    if (exist) {
+      return (
+        <BtnRound
+          icon="heart"
+          solid
+          iconSize={30}
+          size={50}
+          style={styles.btnWishlist}
+          onPress={this.removeFromWishlist}
+        />
+      )
+    }
+    return (
+      <BtnRound
+        icon="heart"
+        iconSize={30}
+        size={50}
+        style={styles.btnWishlist}
+        onPress={this.addToWishlist}
+      />
+    )
+  }
   
   render() {
     if (this.state.isLoading) {
@@ -172,12 +215,7 @@ class ProductDetail extends Component {
                 </TouchableOpacity>
               )}
             />
-            <BtnRound
-              icon="heart"
-              iconSize={30}
-              size={50}
-              style={styles.btnWishlist}
-            />
+            {this.renderWishlistButton()}
           </View>
 
           {/* Title / Pricing */}
@@ -313,13 +351,15 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => ({
   products: state.productsReducer,
   cartItems: state.cartReducer,
-  wishlistItems: state.wishlistReducer
+  wishlist: state.wishlistReducer
 });
 
 const mapDispatchToProps = (dispatch) => ({
   fetchSingleProduct: (productId) => dispatch(fetchSingleProduct(productId)),
   addToCart: (cartItem) => dispatch(addToCart(cartItem)),
-  updateQuantity: (element, index) => dispatch(updateQuantity(element, index))
+  updateQuantity: (element, index) => dispatch(updateQuantity(element, index)),
+  addToWishlist: (wishlistItem) => dispatch(addToWishlist(wishlistItem)),
+  removeFromWishlist: (productId) => dispatch(removeFromWishlist(productId))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductDetail);

@@ -9,6 +9,7 @@ import ProductDetail from './src/container/ProductDetail';
 import Categories from './src/container/Categories';
 import Header from './src/component/Header';
 import Cart from './src/container/Cart';
+import Wishlist from './src/container/Wishlist';
 
 const HomeStackNavigator = createStackNavigator({
   Home: {
@@ -18,7 +19,27 @@ const HomeStackNavigator = createStackNavigator({
     screen: Cart,
     navigationOptions: ({navigation}) => {
       return {
-        header: <Header title={"Cart"} requireBackButton onBackButtonPress={() => navigation.goBack()} onCartPress={() => navigation.navigate('Cart')} />
+        header: <Header 
+          title={"Cart"} 
+          requireBackButton 
+          onBackButtonPress={() => navigation.goBack()} 
+          onCartPress={() => navigation.navigate('Cart')} 
+          onWishlistPress={() => navigation.navigate('Wishlist')} 
+        />
+      }
+    }
+  },
+  Wishlist: {
+    screen: Wishlist,
+    navigationOptions: ({navigation}) => {
+      return {
+        header: <Header 
+          title={"Wishlist"} 
+          requireBackButton 
+          onBackButtonPress={() => navigation.goBack()} 
+          onCartPress={() => navigation.navigate('Cart')} 
+          onWishlistPress={() => navigation.navigate('Wishlist')} 
+        />
       }
     }
   }
@@ -26,7 +47,13 @@ const HomeStackNavigator = createStackNavigator({
   defaultNavigationOptions: ({navigation}) => {
     const {routeName} = navigation.state;
     return {
-      header: <Header hasTabs={false} title={routeName} onMenuPress={() => navigation.openDrawer()} onCartPress={() => navigation.navigate('Cart')} />
+      header: <Header 
+        hasTabs={false} 
+        title={routeName} 
+        onMenuPress={() => navigation.openDrawer()} 
+        onCartPress={() => navigation.navigate('Cart')} 
+        onWishlistPress={() => navigation.navigate('Wishlist')} 
+      />
     }
   }
 });
@@ -36,7 +63,13 @@ const ProductsStackNavigator = createStackNavigator({
     screen: Products,
     navigationOptions: ({navigation}) => {
       return {
-        header: <Header hasTabs={true} title={"Products"} onMenuPress={() => navigation.openDrawer()} onCartPress={() => navigation.navigate('Cart')} />
+        header: <Header 
+          hasTabs={true} 
+          title={"Products"} 
+          onMenuPress={() => navigation.openDrawer()} 
+          onCartPress={() => navigation.navigate('Cart')} 
+          onWishlistPress={() => navigation.navigate('Wishlist')} 
+        />
       }
     }
   },
@@ -47,7 +80,27 @@ const ProductsStackNavigator = createStackNavigator({
     screen: Cart,
     navigationOptions: ({navigation}) => {
       return {
-        header: <Header title={"Cart"} requireBackButton onBackButtonPress={() => navigation.goBack()} onCartPress={() => navigation.navigate('Cart')} />
+        header: <Header 
+          title={"Cart"} 
+          requireBackButton 
+          onBackButtonPress={() => navigation.goBack()} 
+          onCartPress={() => navigation.navigate('Cart')} 
+          onWishlistPress={() => navigation.navigate('Wishlist')} 
+        />
+      }
+    }
+  },
+  Wishlist: {
+    screen: Wishlist,
+    navigationOptions: ({navigation}) => {
+      return {
+        header: <Header 
+          title={"Wishlist"} 
+          requireBackButton 
+          onBackButtonPress={() => navigation.goBack()} 
+          onCartPress={() => navigation.navigate('Cart')} 
+          onWishlistPress={() => navigation.navigate('Wishlist')} 
+        />
       }
     }
   }

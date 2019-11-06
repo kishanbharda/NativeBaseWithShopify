@@ -2,6 +2,17 @@ import AsyncStorage from '@react-native-community/async-storage';
 import * as Types from '../constants/ActionKeys';
 import * as StorageKeys from '../constants/StorageKeys';
 
+type WishlistItem = {
+  productId: String,
+  productTitle: String,
+  variantId: String,
+  variant: Object,
+  image: String,
+  price: String,
+  quantity: Number,
+  isAvailable: Boolean
+}
+
 export const setWishlistFromStorage = () => {
   return async (dispatch) => {
     const storedItems = await AsyncStorage.getItem(StorageKeys.WISHLIST_ITEMS);
@@ -14,7 +25,11 @@ export const setWishlistFromStorage = () => {
   }
 }
 
-export const addToWishlist = (wishlistItem) => {
+/**
+ * Add item to wishlist
+ * @param {WishlistItem} wishlistItem Wishlist item to add
+ */
+export const addToWishlist = (wishlistItem: WishlistItem) => {
   return async (dispatch) => {
     let storedItems = await AsyncStorage.getItem(StorageKeys.WISHLIST_ITEMS);
     if (storedItems) {
@@ -31,6 +46,10 @@ export const addToWishlist = (wishlistItem) => {
   }
 }
 
+/**
+ * Remove Wishlist item from wishlist
+ * @param {String} productId Product id to remove from wishlist
+ */
 export const removeFromWishlist = (productId) => {
   return async (dispatch) => {
     let storedItems = await AsyncStorage.getItem(StorageKeys.WISHLIST_ITEMS);

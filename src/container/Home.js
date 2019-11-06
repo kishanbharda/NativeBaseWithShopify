@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { StyleSheet, Dimensions, ImageBackground, View, Image, FlatList } from 'react-native';
-import { Container, Content, Footer, Left, Icon, Body, Button, Title, FooterTab, Text, Right, Card, CardItem } from 'native-base';
+import { Container, Content, Title, Text, Card, CardItem } from 'native-base';
 import Carousel from 'react-native-snap-carousel';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import FastImage from 'react-native-fast-image';
 import { connect } from 'react-redux';
-import { setWishlistFromStorage } from '../actions/wishlistAction';
 import { fetchCollections } from '../actions/collectionsActions';
 import banner from '../data/banner';
 import collection from '../data/collections';
@@ -21,14 +21,9 @@ class Home extends Component {
   }
 
   componentDidMount = async () => {
-    this.setData();
     const collections = await this.props.fetchCollections();
     this.setState({ collections, isLoadingCollections: false });
   }
-
-  setData = async () => {
-		this.props.setWishlistFromStorage();
-	}
 
   renderBanner = ({item, index}) => {
     return (
@@ -55,10 +50,20 @@ class Home extends Component {
     return (
       <Card style={Styles.category}>
         <CardItem button onPress={() => this.navigateToProducts(item.id, index)}>
-          <Image 
-            source={{uri: item.image?.src}}
-            style={{width: '100%', height: 200}}
-          />  
+          {
+            item.image?.src ? (
+              <FastImage 
+                source={{uri: item.image?.src}}
+                style={{width: '100%', height: 200}}
+              /> 
+            ) : (
+              <Image 
+                source={{uri: 'item_placeholder'}}
+                style={{width: '100%', height: 200}}
+              /> 
+            )
+          }
+           
         </CardItem>
         <CardItem button onPress={() => this.navigateToProducts(item.id, index)}>
           <Title style={{color: "#000000"}}>{item.title}</Title>
@@ -204,7 +209,6 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   fetchCollections: () => dispatch(fetchCollections()),
-	setWishlistFromStorage: () => dispatch(setWishlistFromStorage()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
