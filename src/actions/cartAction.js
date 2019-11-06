@@ -13,12 +13,13 @@ export const setCartFromStorage = () => {
       });
       dispatch({
         type: Types.SET_TO_CART_ITEMS,
-        cartItems
+        cartItems,
+        totalItems
       });
-      dispatch({
-        type: Types.ADD_TO_TOTAL_ITEMS,
-        items: totalItems
-      });
+      // dispatch({
+      //   type: Types.ADD_TO_TOTAL_ITEMS,
+      //   items: totalItems
+      // });
     }
   }
 }

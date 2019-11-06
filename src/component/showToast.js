@@ -12,7 +12,7 @@ const showToast = (message: String) => {
     animation: false,
     hideOnPress: true,
     delay: 0,
-    opacity: 1
+    opacity: 1,
   });
 }
 

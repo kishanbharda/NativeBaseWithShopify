@@ -17,7 +17,7 @@ const BtnRound = (props) => {
           alignItems: 'center',
           justifyContent: 'center',
           backfaceVisibility: 'hidden',
-          ...getShadow({ color: "#aaaaaa", height: 1, width: 1, radius: 4, opacity: 1 })
+          ...getShadow()
         },
         props.style
       ]}

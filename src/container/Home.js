@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { StyleSheet, Dimensions, ImageBackground, View, Image, FlatList } from 'react-native';
 import { Container, Content, Footer, Left, Icon, Body, Button, Title, FooterTab, Text, Right, Card, CardItem } from 'native-base';
 import Carousel from 'react-native-snap-carousel';
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { connect } from 'react-redux';
+import { setWishlistFromStorage } from '../actions/wishlistAction';
 import { fetchCollections } from '../actions/collectionsActions';
 import banner from '../data/banner';
 import collection from '../data/collections';
@@ -12,14 +14,21 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      collections: []
+      collections: [],
+      isLoading: true,
+      isLoadingCollections: true
     };
   }
 
   componentDidMount = async () => {
+    this.setData();
     const collections = await this.props.fetchCollections();
-    this.setState({ collections });
+    this.setState({ collections, isLoadingCollections: false });
   }
+
+  setData = async () => {
+		this.props.setWishlistFromStorage();
+	}
 
   renderBanner = ({item, index}) => {
     return (
@@ -36,22 +45,22 @@ class Home extends Component {
     )
   }  
 
-  navigateToProducts = (collectionId) => {
+  navigateToProducts = (collectionId, index) => {
     this.props.navigation.navigate("Products", {
-      collectionId
+      'collectionId': index
     });
   }
   
-  renderCategories = ({item}) => {
+  renderCategories = ({item, index}) => {
     return (
       <Card style={Styles.category}>
-        <CardItem button onPress={() => this.navigateToProducts(item.id)}>
+        <CardItem button onPress={() => this.navigateToProducts(item.id, index)}>
           <Image 
             source={{uri: item.image?.src}}
             style={{width: '100%', height: 200}}
           />  
         </CardItem>
-        <CardItem button onPress={() => this.navigateToProducts(item.id)}>
+        <CardItem button onPress={() => this.navigateToProducts(item.id, index)}>
           <Title style={{color: "#000000"}}>{item.title}</Title>
         </CardItem>
       </Card>
@@ -101,14 +110,28 @@ class Home extends Component {
           />
 
           {/* Categories */}
-          <View style={{margin: 10}}>
-            <FlatList
-              data={this.state.collections}
-              extraData={this.state}
-              numColumns={2}
-              keyExtractor={item => item.id}
-              renderItem={this.renderCategories}
-            />
+          <View>
+            {
+              this.state.isLoadingCollections ? (
+                <SkeletonPlaceholder minOpacity={0.8}>
+                  <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {
+                      [1, 2, 3, 4, 5, 6].map((item) => (
+                        <View key={item.toString()} style={{ width: Dimensions.get('screen').width / 2 - 10, height: 250, margin: 5 }} />
+                      ))
+                    }
+                  </View>
+                </SkeletonPlaceholder>
+              ) : (
+                <FlatList
+                  data={this.state.collections}
+                  extraData={this.state}
+                  numColumns={2}
+                  keyExtractor={item => item.id}
+                  renderItem={this.renderCategories}
+                />
+              )
+            }
           </View>
 
           <View style={{backgroundColor: "#000011", padding: 10}}>
@@ -129,6 +152,25 @@ class Home extends Component {
             sliderWidth={Dimensions.get('screen').width}
             itemWidth={(Dimensions.get('screen').width / 2) - 10}
           />
+
+          {
+						!this.state.isLoading && (
+							<SkeletonPlaceholder minOpacity={0.5}>
+								<View style={{ width: "100%", height: 40 }} />
+								<View style={{ width: "100%", height: 140, marginVertical: 1 }} />
+								<View style={{ width: "100%", height: 120, marginVertical: 1 }} />
+								<View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
+									{
+										[1, 2, 3, 4, 5, 6].map((item) => (
+											<View key={item.toString()} style={{ width: Dimensions.get('screen').width / 2 - 10, height: 250, margin: 5 }} />
+										))
+									}
+								</View>
+								<View style={{ width: "100%", height: 120, marginVertical: 1 }} />
+								<View style={{ width: "100%", height: 120, marginVertical: 1 }} />
+							</SkeletonPlaceholder>
+						)
+					}
         </Content>
       </Container>
     );
@@ -152,7 +194,7 @@ const Styles = StyleSheet.create({
   category: {
     flex: 0.5,
     overflow: 'hidden',
-    alignItems: 'center'
+    alignItems: 'center',
   }
 })
 
@@ -161,7 +203,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  fetchCollections: () => dispatch(fetchCollections())
+  fetchCollections: () => dispatch(fetchCollections()),
+	setWishlistFromStorage: () => dispatch(setWishlistFromStorage()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

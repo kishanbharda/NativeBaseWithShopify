@@ -20,23 +20,25 @@ class Products extends Component {
   }
 
   componentDidMount = () => {
+    const index = this.props.navigation.dangerouslyGetParent().getParam('collectionId');
+    this.setState({ initialPage: index })
     this.fetchCollections();
   }
 
   fetchCollections = async () => {
     this.setState({ isLoading: true });
     const collections = await this.props.fetchAllCollectionWithProducts();
-    this.setState({ collections }, () => {
-      const parentCollection = this.props.navigation.dangerouslyGetParent().getParam('collectionId');
-      if (parentCollection) {
-        const collectionToDisplay = this.state.collections.find((ele) => ele.id === parentCollection);
-        this.setState({
-          initialPage: this.state.collections.indexOf(collectionToDisplay),
-          isLoading: false
-        });
-      } else {
-        this.setState({ isLoading: false });
-      }
+    this.setState({ collections, isLoading: false }, () => {
+      // const index = this.props.navigation.dangerouslyGetParent().getParam('collectionId');
+      // if (index) {
+      //   // const collectionToDisplay = this.state.collections.find((ele) => ele.id === parentCollection);
+      //   this.setState({
+      //     initialPage: index,
+      //     isLoading: false
+      //   });
+      // } else {
+      //   this.setState({ isLoading: false });
+      // }
     });
   }
 
@@ -69,7 +71,7 @@ class Products extends Component {
         {/* <Header hasTabs /> */}
         {
           this.state.collections.length === 0 ? (
-            <Tabs renderTabBar={() => <ScrollableTab />}>
+            <Tabs renderTabBar={() => <ScrollableTab />} initialPage={this.state.initialPage} page={this.state.initialPage}>
               {
                 this.props.collections.data.map((item) => (
                   <Tab heading={item.title} key={item.id}>

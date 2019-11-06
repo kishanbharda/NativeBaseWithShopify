@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Image, Dimensions, FlatList } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Image, Dimensions, FlatList, ActivityIndicator } from 'react-native';
 import { Button, Text, Left, Icon, List, ListItem, Right, Container, Content } from 'native-base';
 import FastImage from 'react-native-fast-image';
 import Swiper from 'react-native-swiper';
@@ -18,10 +18,15 @@ import showToast from '../component/showToast';
 import showError from '../component/showError';
 
 class ProductDetail extends Component {
-  // eslint-disable-next-line react/sort-comp
-  static navigationOptions = {
-    header: null,
-  };
+  static navigationOptions = ({navigation}) => ({
+    header: <Header
+      title={"Detail"}
+      requireBackButton={true}
+      onBackButtonPress={() => navigation.goBack()}
+      onCartPress={() => navigation.navigate('Cart')}
+      noShadow
+    />
+  });
 
   constructor(props) {
     super(props);
@@ -90,14 +95,6 @@ class ProductDetail extends Component {
 
   addToCart = async () => {
     this.setState({ isAddingToCart: true });
-    // let variantKey = [];
-    // Object.keys(this.state.selectedOptions).forEach((element) => {
-    //   variantKey.push(this.state.selectedOptions[element])
-    // });
-
-    // variantKey = variantKey.join(" / ");
-    // const selectedVariant = this.state.product.variants.filter((variant) => variant.title === variantKey)[0];
-
     const {selectedVariant} = this.state;
     const exist = this.props.cartItems.data.find((item) => item.variantId === selectedVariant.id);
     if (exist) {
@@ -105,7 +102,6 @@ class ProductDetail extends Component {
       exist.quantity = parseInt(exist.quantity, 10) + parseInt(this.state.quantity, 10);
       await this.props.updateQuantity(exist, index);
       this.setState({ isAddingToCart: false });
-      showToast("Item added to your Cart");
     } else {
       /*
           Here variant is the selected options. For example if user 
@@ -123,7 +119,6 @@ class ProductDetail extends Component {
       }
       this.props.addToCart(cartItem).then(() => {
         this.setState({ isAddingToCart: false });
-        showToast("Item added to your Cart");
       }).catch((error) => {
         this.setState({ isAddingToCart: false }, () => {
           setTimeout(() => {
@@ -135,123 +130,126 @@ class ProductDetail extends Component {
   }
   
   render() {
+    if (this.state.isLoading) {
+      return (
+        <Loader />
+      )
+    }
     return (
-      <Container>
-        {/* Header */}
-        <Header
-          title={this.state.product.title || "Detail"}
-          requireBackButton={true}
-          onBackButtonPress={() => this.props.navigation.goBack()}
-          noShadow
-          transparent
-        />
+      <>
+        <Content
+          style={[styles.container]}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: 70 }}
+        >
 
-        {
-          this.state.isLoading ? (
-            <Loader />
-          ) : (
-            <Content 
-              padder
-              style={[styles.container]}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{paddingBottom: 70 }}
-            >
+          {/* Product images slider */}
+          <View>
+            <FlatList
+              data={this.state.product.images}
+              extraData={this.state}
+              horizontal={true}
+              contentContainerStyle={{ paddingVertical: 20, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}
+              showsHorizontalScrollIndicator={false}
+              ListEmptyComponent={(
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={{ uri: 'item_placeholder' }}
+                    style={styles.image}
+                  />
+                </View>
+              )}
+              renderItem={({item}) => (
+                <TouchableOpacity
+                  style={styles.imageContainer}
+                  key={item.id}
+                  activeOpacity={0.8}
+                >
+                  <FastImage
+                    source={{ uri: item?.src }}
+                    style={styles.image}
+                  />
+                </TouchableOpacity>
+              )}
+            />
+            <BtnRound
+              icon="heart"
+              iconSize={30}
+              size={50}
+              style={styles.btnWishlist}
+            />
+          </View>
 
-              {/* Product images slider */}
-              <View>
-                <FlatList
-                  data={this.state.product.images}
-                  extraData={this.state}
-                  horizontal={true}
-                  contentContainerStyle={{ paddingVertical: 20, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}
-                  showsHorizontalScrollIndicator={false}
-                  renderItem={({item}) => (
-                    <TouchableOpacity
-                      style={styles.imageContainer}
-                      key={item.id}
-                      activeOpacity={0.8}
-                    >
-                      <FastImage
-                        source={{ uri: item?.src }}
-                        style={styles.image}
-                      />
-                    </TouchableOpacity>
-                  )}
-                />
-                <BtnRound
-                  icon="heart"
-                  iconSize={30}
-                  size={50}
-                  style={styles.btnWishlist}
-                />
-              </View>
+          {/* Title / Pricing */}
+          <View style={styles.detailContainer}>
+            <CText style={{flex: 1, paddingRight: 10}} size={24} bold color="#000000">
+              {this.state.product.title}
+            </CText>
+            <CText size={24} color={Colors.price}>${this.state.selectedVariant.price}</CText>
+          </View>
+            
+          {/* Variants */}
+          <View>
+            {
+              this.state.product.options.map((option, variantIndex) => (
+                option.name !== "Title" && (
+                  <>
+                    <Hr />
+                    <View key={option.id} style={styles.variantContainer}>
+                      <CText style={{marginLeft: 20, width: 80}}>{option.name}</CText>
+                      <ScrollView 
+                        horizontal 
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{paddingHorizontal: 20, paddingVertical: 5}}
+                        style={{}}
+                      >
+                        {
+                          option.values.map((value, index) => (
+                            <TouchableOpacity 
+                              key={index.toString()}
+                              style={[
+                                styles.variantBadge,
+                                this.state.selectedOptions[variantIndex].value === value.value ? {
+                                  borderWidth: 0.5,
+                                  borderColor: Colors.primary,
+                                } : {}
+                              ]}
+                              onPress={() => this.onVariantPress(variantIndex, value.value)}
+                            >
+                              <CText>{value.value}</CText>
+                            </TouchableOpacity>
+                          ))
+                        }
+                      </ScrollView>
+                    </View>
+                  </>
+                )
+              ))
+            }
+          </View>
 
-              {/* Title / Pricing */}
-              <View style={styles.detailContainer}>
-                <CText style={{flex: 1, paddingRight: 10}} size={24} bold color="#000000">
-                  {this.state.product.title}
-                </CText>
-                <CText size={24} color={Colors.price}>${this.state.selectedVariant.price}</CText>
-              </View>
-              
-              {/* Variants */}
-              <View>
-                {
-                  this.state.product.options.map((option, variantIndex) => (
-                    option.name !== "Title" && (
-                      <>
-                        <Hr />
-                        <View key={option.id} style={styles.variantContainer}>
-                          <CText style={{marginLeft: 20, width: 80}}>{option.name}</CText>
-                          <ScrollView 
-                            horizontal 
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={{paddingHorizontal: 20, paddingVertical: 5}}
-                            style={{}}
-                          >
-                            {
-                              option.values.map((value, index) => (
-                                <TouchableOpacity 
-                                  key={index.toString()}
-                                  style={[
-                                    styles.variantBadge,
-                                    this.state.selectedOptions[variantIndex].value === value.value ? {
-                                      borderWidth: 0.5,
-                                      borderColor: Colors.primary,
-                                    } : {}
-                                  ]}
-                                  onPress={() => this.onVariantPress(variantIndex, value.value)}
-                                >
-                                  <CText>{value.value}</CText>
-                                </TouchableOpacity>
-                              ))
-                            }
-                          </ScrollView>
-                        </View>
-                      </>
-                    )
-                  ))
-                }
-              </View>
+          {/* Product Description */}
+          <Hr />
+          <View style={{marginVertical: 10, paddingHorizontal: 20}}>
+            <CText size={20} bold>Description</CText>
+            <CText>{this.state.product.description}</CText>
+          </View>
 
-              {/* Product Description */}
-              <Hr />
-              <View style={{marginVertical: 10, paddingHorizontal: 20}}>
-                <CText size={20} bold>Description</CText>
-                <CText>{this.state.product.description}</CText>
-              </View>
-
-            </Content>
-
+        </Content>
+      
+        <Button activeOpacity={1} dark block style={styles.btnAddToCart} iconLeft onPress={this.addToCart}>
+          {
+            this.state.isAddingToCart ? (
+              <ActivityIndicator animating={true} />
+            ) : (
+              <>
+                <Icon name="cart-plus" type="FontAwesome5" />
+                <Text>ADD TO CART</Text>
+              </>
             )
           }
-      
-        <Button dark block style={styles.btnAddToCart} iconLeft onPress={this.addToCart}>
-          <Icon name="cart-plus" type="FontAwesome5" />
-          <Text>ADD TO CART</Text>
         </Button>
-
-      </Container>
+      </>
     );
   }
 }
