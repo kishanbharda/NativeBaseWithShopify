@@ -15,7 +15,6 @@ class Account extends Component {
   render() {
     return (
       <Container>
-        <Header hasTabs={true} title="Account" onPress={() => this.props.navigation.openDrawer()} />
         <Tabs renderTabBar={() => <ScrollableTab />}>
           <Tab heading="Login">
             <Login />

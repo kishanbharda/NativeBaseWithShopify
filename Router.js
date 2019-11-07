@@ -106,6 +106,51 @@ const ProductsStackNavigator = createStackNavigator({
   }
 });
 
+const AccountStack = createStackNavigator({
+  Account: {
+    screen: Account,
+    navigationOptions: ({navigation}) => {
+      return {
+        header: <Header 
+          hasTabs={true} 
+          title={"Account"} 
+          onMenuPress={() => navigation.openDrawer()} 
+          onCartPress={() => navigation.navigate('Cart')} 
+          onWishlistPress={() => navigation.navigate('Wishlist')} 
+        />
+      }
+    }
+  },
+  Cart: {
+    screen: Cart,
+    navigationOptions: ({navigation}) => {
+      return {
+        header: <Header 
+          title={"Cart"} 
+          requireBackButton 
+          onBackButtonPress={() => navigation.goBack()} 
+          onCartPress={() => navigation.navigate('Cart')} 
+          onWishlistPress={() => navigation.navigate('Wishlist')} 
+        />
+      }
+    }
+  },
+  Wishlist: {
+    screen: Wishlist,
+    navigationOptions: ({navigation}) => {
+      return {
+        header: <Header 
+          title={"Wishlist"} 
+          requireBackButton 
+          onBackButtonPress={() => navigation.goBack()} 
+          onCartPress={() => navigation.navigate('Cart')} 
+          onWishlistPress={() => navigation.navigate('Wishlist')} 
+        />
+      }
+    }
+  }
+})
+
 const StackNavigator = createDrawerNavigator({
   Home: {
     screen: HomeStackNavigator,
@@ -114,7 +159,7 @@ const StackNavigator = createDrawerNavigator({
     screen: ProductsStackNavigator
   },
   Account: {
-    screen: Account
+    screen: AccountStack,
   }
 }, {
   unmountInactiveRoutes: true
