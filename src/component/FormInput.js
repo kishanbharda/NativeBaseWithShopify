@@ -1,20 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { View, TextInput } from 'react-native';
-import { withFormikControl } from "react-native-formik";
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import PropTypes from 'prop-types';
 import { getShadow } from '../../config/Styles';
 import Colors from '../../config/Colors';
 
 class FormInput extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
 
-    }
-  }
-
-  focus = () => { this.input.focus(); }
+  focus = () => { this.textInputField.focus(); }
 
   render() {
     const {props} = this;
@@ -48,10 +41,11 @@ class FormInput extends React.PureComponent {
           )
         }
         <TextInput
+          ref={(ref) => { this.textInputField = ref }}
           // eslint-disable-next-line react/jsx-props-no-spreading
           {...this.props}
           placeholder={props.placeholder}
-          ref={(ref) => { this.textInputField = ref }}
+          testID={props.placeholder}
           style={[
             {
               flex: 1,
@@ -60,7 +54,7 @@ class FormInput extends React.PureComponent {
               fontSize: 18,
               color: Colors.primary,
               borderLeftWidth: 0.5,
-              borderLeftColor: "#dddddd"
+              borderLeftColor: "#dddddd",
             },
             props.textInputStyle
           ]}
@@ -90,5 +84,5 @@ FormInput.defaultProps = {
   textInputStyle: null
 }
 
-export default withFormikControl(FormInput)
+export default FormInput
 

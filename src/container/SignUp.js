@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ScrollView, StyleSheet, Button, TextInput } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import { compose } from "recompose";
 import { Formik } from 'formik';
 import { handleTextInput, withNextInputAutoFocusForm, withNextInputAutoFocusInput } from "react-native-formik";
@@ -7,6 +7,7 @@ import FormInput from '../component/FormInput';
 import Colors from '../../config/Colors';
 import CText from '../component/CText';
 import { signUpValidationSchema } from '../util/yupValidationSchema';
+import CButton from '../component/CButton';
 
 const FormInput2 = compose(
   handleTextInput,
@@ -27,12 +28,13 @@ class SignUp extends Component {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="interactive"
       >
         {/* <View style={styles.fillContainer} /> */}
         <Formik
-          initialValues={{ firstName: '', email: '', password: '' }}
-          onSubmit={values => { console.log(values) }}
+          initialValues={{ firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '' }}
+          onSubmit={values => { }}
           validationSchema={signUpValidationSchema}
           render={({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
             <Form>
@@ -40,6 +42,9 @@ class SignUp extends Component {
                 icon="user"
                 placeholder="First Name"
                 value={values.firstName}
+                label="First Name" 
+                name="firstName" 
+                type="name"
                 onChangeText={handleChange('firstName')}
                 onBlur={() => setFieldTouched('firstName')}
               />
@@ -48,6 +53,9 @@ class SignUp extends Component {
               )}
 
               <FormInput2
+                label="Last Name" 
+                name="lastName" 
+                type="name"
                 icon="user"
                 placeholder="Last Name"
                 value={values.lastName}
@@ -59,6 +67,9 @@ class SignUp extends Component {
               )}
 
               <FormInput2
+                label="Email" 
+                name="email" 
+                type="email"
                 icon="envelope"
                 placeholder="E-Mail"
                 value={values.email}
@@ -70,6 +81,9 @@ class SignUp extends Component {
               )}
 
               <FormInput2
+                label="Phone" 
+                name="phone" 
+                type="digit"
                 icon="mobile-alt"
                 placeholder="Phone"
                 value={values.phone}
@@ -81,6 +95,9 @@ class SignUp extends Component {
               )}
 
               <FormInput2
+                label="Password" 
+                name="password" 
+                type="password"
                 icon="key"
                 placeholder="Password"
                 value={values.password}
@@ -92,6 +109,9 @@ class SignUp extends Component {
               )}
 
               <FormInput2
+                label="Confirm Password" 
+                name="confirmPassword" 
+                type="password"
                 icon="key"
                 placeholder="Confirm Password"
                 value={values.confirmPassword}
@@ -102,12 +122,9 @@ class SignUp extends Component {
                 <CText style={{ fontSize: 10, color: 'red' }}>{errors.confirmPassword}</CText>
               )}
 
-              <Button
-                title="SIGN UP"
-                disabled={!isValid}
-                color={Colors.primary}
-                onPress={handleSubmit}
-              />
+              <CButton onPress={handleSubmit} disable={!isValid}>
+                SIGN UP
+              </CButton>
             </Form>
           )}
         />
