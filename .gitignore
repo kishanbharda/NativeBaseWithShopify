@@ -57,6 +57,3 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
-
-/config/ShopifyApi.js
-/config/ShopifyJS.js

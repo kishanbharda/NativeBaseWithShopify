@@ -1,19 +1,12 @@
 import React, { Component } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { compose } from "recompose";
+import { View } from 'react-native';
 import { Formik } from 'formik';
-import { handleTextInput, withNextInputAutoFocusForm, withNextInputAutoFocusInput } from "react-native-formik";
-import FormInput from '../component/FormInput';
-import Colors from '../../config/Colors';
 import CText from '../component/CText';
 import { signUpValidationSchema } from '../util/yupValidationSchema';
 import CButton from '../component/CButton';
-
-const FormInput2 = compose(
-  handleTextInput,
-  withNextInputAutoFocusInput
-)(FormInput);
-const Form = withNextInputAutoFocusForm(View);
+import SafeScrollView from '../component/SafeScrollView';
+import { Form, FormField } from '../component/FormikForm';
+import FormFieldError from '../component/FormFieldError';
 
 class SignUp extends Component {
   constructor(props) {
@@ -25,20 +18,14 @@ class SignUp extends Component {
 
   render() {
     return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-        keyboardShouldPersistTaps="always"
-        keyboardDismissMode="interactive"
-      >
-        {/* <View style={styles.fillContainer} /> */}
+      <SafeScrollView>
         <Formik
           initialValues={{ firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '' }}
-          onSubmit={values => { }}
+          onSubmit={values => { console.log(values) }}
           validationSchema={signUpValidationSchema}
           render={({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
             <Form>
-              <FormInput2
+              <FormField
                 icon="user"
                 placeholder="First Name"
                 value={values.firstName}
@@ -49,10 +36,10 @@ class SignUp extends Component {
                 onBlur={() => setFieldTouched('firstName')}
               />
               {touched.firstName && errors.firstName && (
-                <CText style={{ fontSize: 10, color: 'red' }}>{errors.firstName}</CText>
+                <FormFieldError error={errors.firstName} />
               )}
 
-              <FormInput2
+              <FormField
                 label="Last Name" 
                 name="lastName" 
                 type="name"
@@ -63,10 +50,10 @@ class SignUp extends Component {
                 onBlur={() => setFieldTouched('lastName')}
               />
               {touched.lastName && errors.lastName && (
-                <CText style={{ fontSize: 10, color: 'red' }}>{errors.lastName}</CText>
+                <FormFieldError error={errors.lastName} />
               )}
 
-              <FormInput2
+              <FormField
                 label="Email" 
                 name="email" 
                 type="email"
@@ -77,10 +64,10 @@ class SignUp extends Component {
                 onBlur={() => setFieldTouched('email')}
               />
               {touched.email && errors.email && (
-                <CText style={{ fontSize: 10, color: 'red' }}>{errors.email}</CText>
+                <FormFieldError error={errors.email} />
               )}
 
-              <FormInput2
+              <FormField
                 label="Phone" 
                 name="phone" 
                 type="digit"
@@ -91,10 +78,10 @@ class SignUp extends Component {
                 onBlur={() => setFieldTouched('phone')}
               />
               {touched.phone && errors.phone && (
-                <CText style={{ fontSize: 10, color: 'red' }}>{errors.phone}</CText>
+                <FormFieldError error={errors.phone} />
               )}
 
-              <FormInput2
+              <FormField
                 label="Password" 
                 name="password" 
                 type="password"
@@ -105,10 +92,10 @@ class SignUp extends Component {
                 onBlur={() => setFieldTouched('password')}
               />
               {touched.password && errors.password && (
-                <CText style={{ fontSize: 10, color: 'red' }}>{errors.password}</CText>
+                <FormFieldError error={errors.password} />
               )}
 
-              <FormInput2
+              <FormField
                 label="Confirm Password" 
                 name="confirmPassword" 
                 type="password"
@@ -119,7 +106,7 @@ class SignUp extends Component {
                 onBlur={() => setFieldTouched('confirmPassword')}
               />
               {touched.confirmPassword && errors.confirmPassword && (
-                <CText style={{ fontSize: 10, color: 'red' }}>{errors.confirmPassword}</CText>
+                <FormFieldError error={errors.confirmPassword} />
               )}
 
               <CButton onPress={handleSubmit} disable={!isValid}>
@@ -128,28 +115,9 @@ class SignUp extends Component {
             </Form>
           )}
         />
-
-      </ScrollView>
+      </SafeScrollView>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    flex: 1,
-    padding: 20
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  fillContainer: {
-    flex: 1
-  },
-  image: {
-    alignSelf: "center",
-    resizeMode: "contain"
-  }
-});
-
-export default SignUp;
+export default SignUp
